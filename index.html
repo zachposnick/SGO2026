@@ -24,8 +24,8 @@
 
   body {
     font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    color: var(--navy);
+    background: linear-gradient(180deg, var(--navy) 0%, #0F1D35 100%);
+    color: var(--white);
     overflow-x: hidden;
   }
 
@@ -60,11 +60,6 @@
     color: var(--gold);
     letter-spacing: 0.05em;
     text-decoration: none;
-  }
-  .nav-links {
-    display: flex;
-    gap: 2rem;
-    list-style: none;
   }
   .nav-links a {
     color: rgba(255,255,255,0.8);
@@ -605,7 +600,100 @@
     margin-bottom: 0.5rem;
   }
 
-  /* ---- CTA FOOTER ---- */
+  /* ---- ABOUT ME ---- */
+  .about-me {
+    background: rgba(10, 24, 40, 0.95);
+    padding: 100px 2rem;
+  }
+
+  .about-me .section-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .about-me .section-title {
+    text-align: center;
+    margin-bottom: 3rem;
+    color: var(--white);
+  }
+
+  .about-items {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .about-item {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 2rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    box-shadow: 0 24px 48px rgba(0,0,0,0.18);
+  }
+
+  .about-item:nth-child(even) {
+    flex-direction: row-reverse;
+  }
+
+  .about-text {
+    flex: 1;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.9);
+  }
+
+  .about-text h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: var(--gold);
+    margin-bottom: 0.75rem;
+  }
+
+  .about-image {
+    flex-shrink: 0;
+    width: 200px;
+    height: 200px;
+    background: transparent;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: none;
+  }
+
+  .about-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background: transparent;
+  }
+
+  .about-image.vertical {
+    width: 150px;
+    height: 200px;
+  }
+
+  .about-image.horizontal {
+    width: 250px;
+    height: 150px;
+  }
+
+  .about-image img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+  }
+
+  .about-image svg {
+    width: 80px;
+    height: 80px;
+    fill: rgba(255,255,255,0.8);
+  }
   .cta-footer {
     background: var(--navy);
     text-align: center;
@@ -720,10 +808,7 @@
 <nav style="top: 4px;">
   <a href="#hero" class="nav-logo">Zach for CTC VP</a>
   <ul class="nav-links">
-    <li><a href="#about">About</a></li>
-    <li><a href="#platform">Platform</a></li>
-    <li><a href="#qualifications">Why Zach</a></li>
-    <li><a href="#vision">Vision</a></li>
+    <li><a href="#about-me">About Me</a></li>
   </ul>
 </nav>
 
@@ -738,12 +823,66 @@
   <div class="hero-divider"><div class="hero-divider-diamond"></div></div>
   <p class="hero-tagline"></p>
   <div class="hero-cta">
-    <a href="#platform" class="btn-primary">See My Platform</a>
-    <a href="#qualifications" class="btn-secondary">Why Vote Zach?</a>
+    <a href="#about-me" class="btn-primary">See About Me</a>
+    <a href="#about-me" class="btn-secondary">Learn More</a>
   </div>
   <div class="scroll-hint">
     <span>Scroll</span>
     <div class="scroll-arrow"></div>
+  </div>
+</section>
+
+<!-- ABOUT ME -->
+<section class="about-me" id="about-me">
+  <div class="section-inner">
+    <h2 class="section-title">About Me</h2>
+    <div class="about-items">
+      <div class="about-item reveal">
+        <div class="about-text">
+          <h3>Academic Journey</h3>
+          <p>I'm a sophomore going into the Computer Engineering major at Brooklyn Tech. Some of my favorite classes are Physics and AP Computer Science Principles.</p>
+        </div>
+        <div class="about-image">
+          <img src="Zach.png" alt="Zach academic journey">
+        </div>
+      </div>
+      <div class="about-item reveal">
+        <div class="about-text">
+          <h3>Guitar</h3>
+          <p>I've been playing the guitar for 10 years! Some of my favorite songs to play are "Für Elise" and "Vals Español".</p>
+        </div>
+        <div class="about-image horizontal">
+          <img src="guitar-photo.png" alt="Zach playing guitar">
+        </div>
+      </div>
+      <div class="about-item reveal">
+        <div class="about-text">
+          <h3>Volunteering</h3>
+          <p>I love to volunteer and serve my community. I work a lot with The Campaign Against Hunger, go check them out! I'm also the Co-President of one of the largest volunteering clubs at Brooklyn Tech, Helping Hands.</p>
+        </div>
+        <div class="about-image vertical">
+          <img src="volunteering-photo.png" alt="Zach volunteering">
+        </div>
+      </div>
+      <div class="about-item reveal">
+        <div class="about-text">
+          <h3>Soccer</h3>
+          <p>I used to play for the soccer club GjØa for 6 years. I still love to go to the park and play with my friends!</p>
+        </div>
+        <div class="about-image vertical">
+          <img src="soccer-photo.png" alt="Zach playing soccer">
+        </div>
+      </div>
+      <div class="about-item reveal">
+        <div class="about-text">
+          <h3>Video Games</h3>
+          <p>I love to play video games. Some of my favorites are: Rocket League, Horizon Zero Dawn, Minecraft, and Portal 2 </p>
+        </div>
+        <div class="about-image">
+          <img src="controller.png" alt="Video games controller">
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
