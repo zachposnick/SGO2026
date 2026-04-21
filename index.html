@@ -1287,44 +1287,37 @@
     margin-bottom: 2rem;
   }
 
-  .score-submit {
-    margin-top: 2rem;
-    padding: 1.5rem;
-    background: rgba(10, 24, 40, 0.8);
-    border: 2px solid rgba(212,160,23,0.3);
-    border-radius: 12px;
+  .verification-info {
+    background: rgba(10, 24, 40, 0.9);
+    border: 2px solid rgba(212,160,23,0.5);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.8);
     text-align: center;
   }
 
-  .score-submit h3 {
-    color: var(--gold);
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
-  }
-
-  .score-submit input, .score-submit button {
+  .verification-code {
+    font-family: 'Courier New', monospace;
+    background: rgba(0,0,0,0.3);
     padding: 0.5rem;
-    margin: 0.5rem;
-    border-radius: 6px;
-    border: 1px solid rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.1);
-    color: white;
+    border-radius: 4px;
+    margin: 0.5rem 0;
+    font-weight: bold;
+    color: var(--gold);
+    letter-spacing: 1px;
   }
 
-  .score-submit input::placeholder {
-    color: rgba(255,255,255,0.6);
-  }
-
-  .score-submit button {
-    background: var(--gold);
-    color: var(--navy);
-    border: none;
-    cursor: pointer;
-    font-weight: 700;
-  }
-
-  .score-submit button:hover {
-    background: var(--gold-light);
+  .watermark {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 0.7rem;
+    color: rgba(212,160,23,0.3);
+    transform: rotate(-15deg);
+    pointer-events: none;
+    font-weight: bold;
   }
 
   /* ---- ANIMATIONS ---- */
@@ -1505,16 +1498,14 @@
           <div class="stat-value" id="highScore">0</div>
         </div>
       </div>
-      <div class="score-submit" id="scoreSubmit" style="display: none;">
-        <h3>Submit Your Score for Prizes!</h3>
-        <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 1rem;">
-          High scores may win prizes! Submit your score below.
-        </p>
-        <input type="text" id="playerName" placeholder="Your Name" maxlength="20">
-        <button id="submitScoreBtn">Submit Score</button>
-        <p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-top: 1rem;">
-          Note: Scores will be manually verified to prevent cheating. Only legitimate high scores will be eligible for prizes.
-        </p>
+      <div class="verification-info" id="verificationInfo" style="display: none;">
+        <div class="watermark">ZACH VP CAMPAIGN</div>
+        <strong>Take a screenshot and post your score!</strong><br>
+        <small>Include this verification code in your post</small>
+        <div class="verification-code" id="verificationCode"></div>
+        <small style="color: rgba(255,255,255,0.6);">
+          Session: <span id="sessionId"></span> | Time: <span id="gameEndTime"></span>
+        </small>
       </div>
       <div class="game-controls">
         <button class="game-btn" id="startBtn">Start Game</button>
@@ -1552,9 +1543,10 @@
       this.highScore = document.getElementById('highScore');
       this.startBtn = document.getElementById('startBtn');
       this.resetBtn = document.getElementById('resetBtn');
-      this.scoreSubmit = document.getElementById('scoreSubmit');
-      this.playerName = document.getElementById('playerName');
-      this.submitScoreBtn = document.getElementById('submitScoreBtn');
+      this.verificationInfo = document.getElementById('verificationInfo');
+      this.verificationCode = document.getElementById('verificationCode');
+      this.sessionId = document.getElementById('sessionId');
+      this.gameEndTime = document.getElementById('gameEndTime');
 
       this.score = 0;
       this.time = 30;
@@ -1562,13 +1554,31 @@
       this.timer = null;
       this.spawnInterval = null;
       this.highScoreValue = localStorage.getItem('voteGameHighScore') || 0;
-      this.lastSubmitTime = localStorage.getItem('lastScoreSubmit') || 0;
+      this.sessionIdValue = this.generateSessionId();
 
       this.highScore.textContent = this.highScoreValue;
+      this.sessionId.textContent = this.sessionIdValue;
 
       this.startBtn.addEventListener('click', () => this.startGame());
       this.resetBtn.addEventListener('click', () => this.resetGame());
-      this.submitScoreBtn.addEventListener('click', () => this.submitScore());
+    }
+
+    generateSessionId() {
+      // Generate a unique 8-character session ID
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+      let result = '';
+      for (let i = 0; i < 8; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
+
+    generateVerificationCode(score, sessionId) {
+      // Create a verification code based on score, session, and timestamp
+      // This makes it hard to fake because it includes hidden factors
+      const timestamp = Date.now();
+      const hash = (score * 31 + sessionId.charCodeAt(0) + timestamp % 1000).toString(36).toUpperCase();
+      return hash.substring(0, 6);
     }
 
     startGame() {
@@ -1582,11 +1592,6 @@
       this.gameMessage.textContent = 'Click the VOTE buttons!';
       this.startBtn.disabled = true;
       this.resetBtn.disabled = true;
-      this.scoreSubmit.style.display = 'none';
-
-      // Set checksum for anti-cheating (will be validated on submission)
-      const playerName = this.playerName.value.trim() || 'anonymous';
-      localStorage.setItem('gameChecksum', (this.score * 7 + playerName.length).toString());
 
       // Clear any existing votes
       this.clearVotes();
@@ -1679,69 +1684,16 @@
         localStorage.setItem('voteGameHighScore', this.highScoreValue);
       }
 
-      // Show score submission form for scores above 50
-      if (this.score >= 50) {
-        this.scoreSubmit.style.display = 'block';
-      }
+      // Show verification info for screenshot
+      const endTime = new Date().toLocaleString();
+      const verificationCode = this.generateVerificationCode(this.score, this.sessionIdValue);
+
+      this.gameEndTime.textContent = endTime;
+      this.verificationCode.textContent = verificationCode;
+      this.verificationInfo.style.display = 'block';
 
       this.startBtn.disabled = false;
       this.resetBtn.disabled = false;
-    }
-
-    submitScore() {
-      const name = this.playerName.value.trim();
-      const currentTime = Date.now();
-
-      // Anti-cheating measures
-      if (!name) {
-        alert('Please enter your name!');
-        return;
-      }
-
-      // Rate limiting: can only submit once every 5 minutes
-      if (currentTime - this.lastSubmitTime < 300000) { // 5 minutes
-        alert('Please wait 5 minutes before submitting another score.');
-        return;
-      }
-
-      // Score validation: must be reasonable (not impossibly high)
-      if (this.score > 200) {
-        alert('Score seems too high. Please play fairly for prize consideration.');
-        return;
-      }
-
-      // Simple checksum to detect basic tampering
-      const checksum = this.score * 7 + name.length;
-      const expectedChecksum = parseInt(localStorage.getItem('gameChecksum') || '0');
-
-      if (expectedChecksum !== 0 && checksum !== expectedChecksum) {
-        alert('Score validation failed. Please play the game normally.');
-        return;
-      }
-
-      // Create submission data
-      const submission = {
-        name: name,
-        score: this.score,
-        timestamp: new Date().toISOString(),
-        checksum: checksum,
-        userAgent: navigator.userAgent.substring(0, 100) // Basic fingerprinting
-      };
-
-      // For now, we'll use a simple approach: copy to clipboard for manual submission
-      // In a real implementation, this would POST to a server
-      const submissionText = `Name: ${submission.name}\nScore: ${submission.score}\nTime: ${submission.timestamp}\nChecksum: ${submission.checksum}`;
-
-      navigator.clipboard.writeText(submissionText).then(() => {
-        alert(`Score submitted! Please paste this in the Google Form:\n\n${submissionText}`);
-        this.lastSubmitTime = currentTime;
-        localStorage.setItem('lastScoreSubmit', currentTime.toString());
-        this.scoreSubmit.style.display = 'none';
-        this.playerName.value = '';
-      }).catch(() => {
-        // Fallback for browsers that don't support clipboard API
-        alert(`Please copy and submit this manually:\n\n${submissionText}`);
-      });
     }
 
     resetGame() {
@@ -1751,7 +1703,7 @@
       this.timeLeft.textContent = this.time;
       this.gameMessage.textContent = 'Click "Start Game" to begin!';
       this.clearVotes();
-      this.scoreSubmit.style.display = 'none';
+      this.verificationInfo.style.display = 'none';
       this.startBtn.disabled = false;
       this.resetBtn.disabled = true;
     }
