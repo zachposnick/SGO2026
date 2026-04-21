@@ -1149,6 +1149,9 @@
     border-radius: 8px;
     overflow: hidden;
     margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .game-controls {
@@ -1449,6 +1452,40 @@
   </div>
 </section>
 
+<!-- VOTE GAME -->
+<section class="vote-game" id="vote-game">
+  <div class="section-inner">
+    <h2 class="section-title">Vote Clicker Challenge</h2>
+    <div class="game-container">
+      <div class="game-instructions">
+        Click the "VOTE" buttons as fast as you can! Help Zach win the election by collecting as many votes as possible in 30 seconds.
+      </div>
+      <div class="game-area" id="gameArea">
+        <div class="game-message" id="gameMessage">Click "Start Game" to begin!</div>
+      </div>
+      <div class="game-stats">
+        <div class="stat-item">
+          <div class="stat-label">Votes</div>
+          <div class="stat-value" id="voteCount">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Time</div>
+          <div class="stat-value" id="timeLeft">30</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">High Score</div>
+          <div class="stat-value" id="highScore">0</div>
+        </div>
+      </div>
+      <div class="game-controls">
+        <button class="game-btn" id="startBtn">Start Game</button>
+        <button class="game-btn" id="resetBtn" disabled>Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+
 <!-- Footer -->
 <footer>
   Authorized by the campaign of <span>Zach</span> for Club Team Council Vice President &nbsp;·&nbsp; Brooklyn Technical High School &nbsp;·&nbsp; 2026
@@ -1584,18 +1621,14 @@
       clearInterval(this.spawnInterval);
       this.clearVotes();
 
-      this.gameMessage.textContent = `Game Over! You collected ${this.score} votes! Voting is from May 7th to 11th, vote for Zach!`;
+      this.gameMessage.textContent = `You collected ${this.score} votes! Voting is from May 7th to 11th, vote for Zach!`;
 
       // Update high score
       if (this.score > this.highScoreValue) {
         this.highScoreValue = this.score;
         this.highScore.textContent = this.highScoreValue;
         localStorage.setItem('voteGameHighScore', this.highScoreValue);
-        this.gameMessage.textContent += ' 🎉 New High Score!';
       }
-
-      // Add voting information
-      this.gameMessage.textContent += ' Voting is from May 7th to 11th, vote for Zach!';
 
       this.startBtn.disabled = false;
       this.resetBtn.disabled = false;
@@ -1620,15 +1653,3 @@
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
